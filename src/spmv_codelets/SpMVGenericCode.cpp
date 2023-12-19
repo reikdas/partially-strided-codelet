@@ -6,6 +6,7 @@
 #include "GenericCodelets.h"
 
 #include <vector>
+#include <iostream>
 
 namespace DDT {
     template<class type>
@@ -53,32 +54,37 @@ namespace DDT {
                       const std::vector<Codelet *> *lst,
                       const DDT::Config &cfg) {
  // Perform SpMV
-        auto a = std::chrono::steady_clock::now();
-#pragma omp parallel for num_threads(cfg.nThread)
+        // auto a = std::chrono::steady_clock::now();
+// #pragma omp parallel for num_threads(cfg.nThread)
         for (int i = 0; i < cfg.nThread; i++) {
             for (const auto &c : lst[i]) {
                 switch (c->get_type()) {
                     case CodeletType::TYPE_FSC:
+                        // std::cout << "FSC" << std::endl;
                         fsc_t2_2DC(y, Ax, x, c->row_offset, c->first_nnz_loc,
                                    c->lbr, c->lbr + c->row_width, c->lbc,
                                    c->col_width + c->lbc, c->col_offset);
                         break;
                     case CodeletType::TYPE_PSC1:
+                        // std::cout << "PSC1" << std::endl;
                         psc_t1_2D4R(y, Ax, x, c->offsets, c->lbr,
                                     c->lbr + c->row_width, c->lbc,
                                     c->lbc + c->col_width);
                         break;
                     case CodeletType::TYPE_PSC2:
+                        // std::cout << "PSC2" << std::endl;
                         psc_t2_2DC(y, Ax, x, c->offsets, c->row_offset,
                                    c->first_nnz_loc, c->lbr,
                                    c->lbr + c->row_width, c->col_width,
                                    c->col_offset);
                         break;
                     case CodeletType::TYPE_PSC3:
+                        // std::cout << "PSC3" << std::endl;
                         psc_t3_1D1R(y, Ax, Ai, x, c->offsets, c->lbr,
                                     c->first_nnz_loc, c->col_width);
                         break;
                     case CodeletType::TYPE_F_PSC:
+                        // std::cout << "F_PSC" << std::endl;
                         f_psc_t2(c->col_width, c->first_nnz_loc, c->col_offset,
                                  c->lbr, c->lbr + c->row_width, c->row_offset,
                                  c->offsets, Ax, x, y);

@@ -9,6 +9,7 @@
 #include <DDT.h>
 #include <DDTCodelets.h>
 #include <Executor.h>
+#include <unordered_map>
 
 #include <math.h>
 

@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <cstdint>
 #include <immintrin.h>
 #include <tuple>
 #include <utility>

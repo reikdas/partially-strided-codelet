@@ -26,6 +26,8 @@
 
 #include <chrono>
 #include <vector>
+#include <sys/time.h>
+#include <iostream>
 
 namespace DDT {
 void executeSpTRSCodelets(const std::vector<DDT::Codelet*>* cl, const DDT::Config& c) {
@@ -57,7 +59,14 @@ void executeSPMVCodelets(const std::vector<DDT::Codelet*>* cl, const DDT::Config
   auto y = new double[m.r]();
 
   // Execute SpMV
+  struct timeval t1;
+    gettimeofday(&t1, NULL);
+    long t1s = t1.tv_sec * 1000000L + t1.tv_usec;
   DDT::spmv_generic(m.r, m.Lp, m.Li, m.Lx, x, y, cl, c);
+  struct timeval t2;
+      gettimeofday(&t2, NULL);
+      long t2s = t2.tv_sec * 1000000L + t2.tv_usec;
+      std::cout << (t2s - t1s) << std::endl;
 
   // Clean up memory
   delete[] x;
