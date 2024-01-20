@@ -56,7 +56,9 @@ namespace DDT {
       ("prefetch_distance", "Max length of periodic iteration space to find", cxxopts::value<int>()->default_value("0"))
       ("analyze", "Return analysis information instead of computing numerical method", cxxopts::value<bool>()->default_value("false"))
       ("analyze_codelets", "Return analysis information for individual codelets instead of computing numerical method", cxxopts::value<bool>()->default_value("false"))
-      ("d,header", "prints header or not.");
+      ("d,header", "prints header or not.")
+      ("bench_executor", "Benchmark executor", cxxopts::value<bool>()->default_value("false"))
+      ("bench_inspector", "Benchmark inspector", cxxopts::value<bool>()->default_value("false"));
 
     auto result = options.parse(argc, argv);
 
@@ -96,6 +98,10 @@ namespace DDT {
     auto prefetch_distance = result["prefetch_distance"].as<int>();
     auto analyze = result["analyze"].as<bool>();
     auto analyzeCodelets = result["analyze_codelets"].as<bool>();
+    auto bench_executor = result["bench_executor"].as<bool>();
+    auto bench_inspector = result["bench_inspector"].as<bool>();
+
+    assert(!(bench_executor && bench_inspector));
 
     assert(lim <= MAX_LIM);
 
@@ -131,6 +137,6 @@ namespace DDT {
 
    return Config{ matrixPath, op, header, nThreads, sf, coarsening, bpacking,
     tuning_en, lim,
-    static_cast<_mm_hint>(hint), prefetch_distance, analyze, analyzeCodelets, mTileSize, nTileSize, bMatrixCols };
+    static_cast<_mm_hint>(hint), prefetch_distance, analyze, analyzeCodelets, mTileSize, nTileSize, bMatrixCols, bench_executor, bench_inspector};
   }
 }

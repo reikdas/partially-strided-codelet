@@ -61,6 +61,8 @@ namespace DDT {
    int mTileSize;
    int nTileSize;
    int bMatrixCols;
+   bool bench_executor;
+   bool bench_inspector;
   };
 
   struct GlobalObject {

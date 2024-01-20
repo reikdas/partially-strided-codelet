@@ -55,7 +55,7 @@ namespace DDT {
                       const DDT::Config &cfg) {
  // Perform SpMV
         // auto a = std::chrono::steady_clock::now();
-// #pragma omp parallel for num_threads(cfg.nThread)
+#pragma omp parallel for num_threads(cfg.nThread)
         for (int i = 0; i < cfg.nThread; i++) {
             for (const auto &c : lst[i]) {
                 switch (c->get_type()) {
