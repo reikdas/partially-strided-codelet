@@ -6,13 +6,11 @@ FILEPATH = pathlib.Path(__file__).resolve().parent
 BASE_PATH = os.path.join(FILEPATH, "..")
 
 if __name__ == "__main__":
-    # benchlist = ["bench_inspector", "bench_executor"]
-    benchlist = ["bench_executor"]
+    benchlist = ["bench_inspector", "bench_executor"]
     for benchfile in benchlist:
-        # for threads in [1, 2, 4, 8, 16]:
-        for threads in [1]:
+        for threads in [1, 2, 4, 8, 16]:
             with open(benchfile+"_"+str(threads)+"thrds.csv", "w") as f:
-                VBR_PATH = f"{BASE_PATH}/SABLE/Generated_MMarket"
+                VBR_PATH = f"{BASE_PATH}/Generated_MMarket"
                 for filename in os.listdir(VBR_PATH):
                     print(f"Benchmarking {filename} with {threads} threads")
                     assert(filename.endswith(".mtx"))
