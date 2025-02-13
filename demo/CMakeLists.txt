@@ -1,4 +1,4 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 include_directories(${CSR5_INCLUDE_DIR} ${CUSP_INCLUDE_DIR})
 add_executable(spmv_demo
         FusionDemo.cpp
