@@ -80,8 +80,19 @@ void executeSPMVCodelets(const std::vector<DDT::Codelet*>* cl, const DDT::Config
 void executeSPMMCodelets(const std::vector<DDT::Codelet*>* cl, const
 DDT::Config& cfg, const int r, const int* Lp, const int *Li, const double*Ax,
 const double* Bx, double* Cx, int bRows, int bCols) {
-    // Execute SpMV
+        // Execute SpMM
+    if (cfg.bench_executor) {
+      struct timeval t1;
+      gettimeofday(&t1, NULL);
+      long t1s = t1.tv_sec * 1000000L + t1.tv_usec;
+      DDT::spmm_generic(r, Lp, Li, Ax, Bx, Cx, bRows, bCols, cl, cfg);
+      struct timeval t2;
+      gettimeofday(&t2, NULL);
+      long t2s = t2.tv_sec * 1000000L + t2.tv_usec;
+      std::cout << (t2s - t1s) << std::endl;
+  } else {
     DDT::spmm_generic(r, Lp, Li, Ax, Bx, Cx, bRows, bCols, cl, cfg);
+  }
 }
 
 void executeSPSPMMCodelets(const std::vector<DDT::Codelet*>* cl, const

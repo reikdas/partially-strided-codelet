@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
     auto spmm_parallel_baseline = spsp->evaluate();
     auto spmm_parallel_baseline_elapsed = spmm_parallel_baseline.elapsed_time;
     delete spsp;
+#endif
 
 #ifdef PERMUTED
     auto *spPermuted = new sparse_avx::SpMMPermutedParallel(B, A_full, final_solution, bRows, bCols, "SpMM Permuted Parallel");
@@ -108,27 +109,27 @@ int main(int argc, char *argv[]) {
     delete spddt;
 
 
-    if (config.header) {
-      std::cout << "Matrix,nRows,nCols,NNZ,mTileSize,nTileSize,bCols,SpMM "
-        "Baseline,SpMM Parallel,SpMM Tiled Parallel,SpMM MKL,SpMM DDT,SpMM DDT Analysis";
+//     if (config.header) {
+//       std::cout << "Matrix,nRows,nCols,NNZ,mTileSize,nTileSize,bCols,SpMM "
+//         "Baseline,SpMM Parallel,SpMM Tiled Parallel,SpMM MKL,SpMM DDT,SpMM DDT Analysis";
 
-#ifdef PERMUTED
-      std::cout << ",SpMM Permuted Parallel"
-#endif
-        std::cout << "\n";
-    }
-    std::cout << config.matrixPath << "," << B->m << "," << B->n << "," << B->nnz << "," << config.mTileSize
-    << "," << config.nTileSize << "," << config.bMatrixCols << "," <<spmm_baseline.elapsed_time << ","
-    << spmm_parallel_baseline_elapsed << "," << spmm_tiled_parallel_baseline_elapsed << ","
-    << spmm_mkl_eval_elapsed << "," //<< spmm_ddt_eval_elapsed_ser<< "," 
-    << spmm_ddt_eval_elapsed <<","
-    << spmm_ddtp_analysis_elapsed.elapsed_time;
+// #ifdef PERMUTED
+//       std::cout << ",SpMM Permuted Parallel"
+// #endif
+//         std::cout << "\n";
+//     }
+    // std::cout << config.matrixPath << "," << B->m << "," << B->n << "," << B->nnz << "," << config.mTileSize
+    // << "," << config.nTileSize << "," << config.bMatrixCols << "," <<spmm_baseline.elapsed_time << ","
+    // << spmm_parallel_baseline_elapsed << "," << spmm_tiled_parallel_baseline_elapsed << ","
+    // << spmm_mkl_eval_elapsed << "," //<< spmm_ddt_eval_elapsed_ser<< "," 
+    // << spmm_ddt_eval_elapsed <<","
+    // << spmm_ddtp_analysis_elapsed.elapsed_time;
 
-#ifdef PERMUTED
-    std::cout << "," << spmm_permuted_parallel_baseline_elapsed;
-#endif
-    std::cout << "\n";
-#endif
+// #ifdef PERMUTED
+//     std::cout << "," << spmm_permuted_parallel_baseline_elapsed;
+// #endif
+//     std::cout << "\n";
+// #endif
 
     delete A;
     delete B;

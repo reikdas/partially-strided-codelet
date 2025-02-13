@@ -15,9 +15,14 @@ if __name__ == "__main__":
                     print(f"Benchmarking {filename} with {threads} threads")
                     assert(filename.endswith(".mtx"))
                     f.write(f"{filename[:-4]}")
-                    subprocess.call([f"{BASE_PATH}/partially-strided-codelet/build/DDT", "-m", os.path.join(VBR_PATH, filename), "-n", "SPMV", "-s", "CSR", "--"+benchfile, "-t", str(threads)], stdout=subprocess.PIPE)
-                    for i in range(5):
-                        print(f"{i+1}th iteration")
-                        output = subprocess.run([f"{BASE_PATH}/partially-strided-codelet/build/DDT", "-m", os.path.join(VBR_PATH, filename), "-n", "SPMV", "-s", "CSR", "--"+benchfile, "-t", str(threads)], capture_output=True)
-                        f.write(","+output.stdout.decode("utf-8")[:-1])
+                    try:
+                        output = subprocess.run([f"{BASE_PATH}/partially-strided-codelet/build/demo/spmm_demo", "-m", os.path.join(VBR_PATH, filename), "-n", "SPMM", "-s", "CSR", "--"+benchfile, "-t", str(threads)], capture_output=True, check=True)
+                    except subprocess.CalledProcessError as err:
+                        print(filename + " failed with " + str(err))
+                        continue
+                    psc_times = output.stdout.decode("utf-8").split("\n")[:-1]
+                    # Write the output to the file
+                    for time in psc_times:
+                        f.write(f",{time}")
                     f.write("\n")
+                    f.flush()
