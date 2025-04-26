@@ -6,6 +6,7 @@ from collections import defaultdict
 
 FILEPATH = pathlib.Path(__file__).resolve().parent
 BASE_PATH = os.path.join(FILEPATH)
+SABLE_PATH = os.path.join(BASE_PATH, "..")
 
 def check_file_matches_parent_dir(filepath):
     """
@@ -31,10 +32,9 @@ def check_file_matches_parent_dir(filepath):
     return file_name == parent_dir
 
 if __name__ == "__main__":
-    THREADS = [1]
-    mtx_dir = os.path.join("/home/das160/Suitesparse")
-    # benchlist = ["bench_inspector", "bench_executor"]
-    # op = ["SPMM", "SPMV"]
+    THREADS = [1,2,4,8]
+    mtx_dir = os.path.join(SABLE_PATH, "Suitesparse")
+    benchlist = ["bench_inspector", "bench_executor"]
     ops = ["SPMV"]
     eval = ["eris1176",
     "std1_Jac3",
@@ -70,7 +70,8 @@ if __name__ == "__main__":
     "nd12k",
     "std1_Jac2",
     "vsp_c-30_data_data"]
-    cores = [0, 2, 4, 6, 8, 10, 12, 14]
+    # Adjust if hyperthreading is enabled
+    cores = [i for i in range(0, 8)]
     for benchfile in benchlist:
         for threads in THREADS:
             str_cores = ",".join(map(str, cores[:threads]))
