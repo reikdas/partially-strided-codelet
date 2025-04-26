@@ -69,6 +69,11 @@ void executeSPMVCodelets(const std::vector<DDT::Codelet*>* cl, const DDT::Config
     DDT::spmv_generic(m.r, m.Lp, m.Li, m.Lx, x, y, cl, c);
   }
 
+  // Print y
+  for (int i = 0; i < m.r; i++) {
+    std::cout << y[i] << "\n";
+  }
+
   // Clean up memory
   delete[] x;
   delete[] y;
