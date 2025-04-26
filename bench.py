@@ -1,6 +1,8 @@
 import subprocess
 import os
 import pathlib
+import csv
+from collections import defaultdict
 
 FILEPATH = pathlib.Path(__file__).resolve().parent
 BASE_PATH = os.path.join(FILEPATH)
@@ -29,29 +31,107 @@ def check_file_matches_parent_dir(filepath):
     return file_name == parent_dir
 
 if __name__ == "__main__":
-    mtx_dir = os.path.join("/local", "scratch", "a", "Suitesparse")
-    benchlist = ["bench_inspector", "bench_executor"]
+    THREADS = [1]
+    mtx_dir = os.path.join("/home/das160/Suitesparse")
+    # benchlist = ["bench_inspector", "bench_executor"]
     # op = ["SPMM", "SPMV"]
     ops = ["SPMV"]
+    eval = ["eris1176",
+    "std1_Jac3",
+    "lp_wood1p",
+    "jendrec1",
+    "lowThrust_5",
+    "hangGlider_4",
+    "brainpc2",
+    "hangGlider_3",
+    "lowThrust_7",
+    "lowThrust_11",
+    "lowThrust_3",
+    "lowThrust_6",
+    "lowThrust_12",
+    "hangGlider_5",
+    "Journals",
+    "bloweybl",
+    "heart1",
+    "TSOPF_FS_b9_c6",
+    "Sieber",
+    "case9",
+    "c-30",
+    "c-32",
+    "freeFlyingRobot_10",
+    "freeFlyingRobot_11",
+    "freeFlyingRobot_12",
+    "lowThrust_10",
+    "lowThrust_13",
+    "lowThrust_4",
+    "lowThrust_8",
+    "lowThrust_9",
+    "lp_fit2p",
+    "nd12k",
+    "std1_Jac2",
+    "vsp_c-30_data_data"]
+    cores = [0, 2, 4, 6, 8, 10, 12, 14]
     for benchfile in benchlist:
-        # for threads in [1, 2, 4, 8, 16]:
-        for threads in [1]:
+        for threads in THREADS:
+            str_cores = ",".join(map(str, cores[:threads]))
             for op in ops:
                 with open(benchfile+"_"+str(threads)+"thrds_" + op + ".csv", "w") as f:
                     f.write("Matrix,Time(ns)\n")
                     for file_path in pathlib.Path(mtx_dir).rglob("*"):
                         if file_path.is_file() and file_path.suffix == ".mtx" and check_file_matches_parent_dir(file_path):
                             fname = pathlib.Path(file_path).resolve().stem
+                            if fname not in eval:
+                                continue
                             print(f"Benchmarking {fname} with {threads} threads")
                             f.write(fname)
                             try:
-                                output = subprocess.check_output([f"{BASE_PATH}/build/DDT", "-m", file_path, "-n", op, "-s", "CSR", "--"+benchfile, "-t", str(threads)])
+                                output = subprocess.check_output(["taskset", "-a", "-c", str_cores, f"{BASE_PATH}/build/DDT", "-m", file_path, "-n", op, "-s", "CSR", "--"+benchfile, "-t", str(threads)])
                             except subprocess.CalledProcessError as err:
                                 print(fname + " failed with " + str(err))
                                 continue
-                            psc_times = output.decode("utf-8").split("\n")[:-1]
+                            psc_times = output.decode("utf-8").split("\n")[0]
+                            print(psc_times)
                             # Write the output to the file
-                            for time in psc_times:
-                                f.write(f",{time}")
-                            f.write("\n")
+                            # for time in psc_times:
+                                # f.write(f",{time}")
+                            # f.write("\n")
+                            f.write(f",{psc_times}\n")
                             f.flush()
+
+        # Merge the CSV files
+        merged_data = defaultdict(list)
+        matrix_set = set()
+
+        # Read all thread-specific files
+        for threads in THREADS:
+            for op in ops:
+                filename = f"{benchfile}_{threads}thrds_{op}.csv"
+                with open(filename, "r") as f:
+                    reader = csv.reader(f)
+                    next(reader)  # Skip header
+                    for row in reader:
+                        if row:
+                            matrix = row[0]
+                            matrix_set.add(matrix)
+                            time_val = row[1] if len(row) > 1 else ""
+                            merged_data[matrix].append(time_val)
+
+        # Write merged output
+        with open(f"{benchfile}_{op}_merged.csv", "w") as merged_file:
+            merged_file.write("Matrix")
+            for threads in THREADS:
+                for op in ops:
+                    merged_file.write(f",{threads} Threads")
+            merged_file.write("\n")
+
+            for matrix in sorted(matrix_set):
+                merged_file.write(matrix)
+                times = merged_data.get(matrix, [])
+                for time in times:
+                    merged_file.write(f",{time}")
+                # Fill in any missing times (if some thread configs failed)
+                if len(times) < len(THREADS) * len(ops):
+                    merged_file.write("," * (len(THREADS) * len(ops) - len(times)))
+                merged_file.write("\n")
+
+                
